@@ -1,6 +1,7 @@
 pipeline {
     agent any
 
+    // ---------- Глобальные параметры----------
     parameters {
         string(
             name: 'RemoteHostVm',
@@ -13,6 +14,7 @@ pipeline {
         stage('Check Docker') {
             steps {
                 script {
+                    // Подключаем credentials
                     withCredentials([
                         usernamePassword(
                             credentialsId: 'ssh-elma1-pass-and-login',
@@ -20,7 +22,7 @@ pipeline {
                             passwordVariable: 'SshPassword'
                         )
                     ]) {
-                        // Объявляем remote через def внутри script
+                        // Объявляем remote внутри script через def
                         def remote = [
                             name: 'elma',
                             host: params.RemoteHostVm,
@@ -29,6 +31,9 @@ pipeline {
                             allowAnyHosts: true
                         ]
 
+                        echo "Connecting to ${remote.host} as ${remote.user}"
+
+                        // Выполняем команду на удалённом сервере
                         sshCommand remote: remote, command: 'docker ps'
                     }
                 }
