@@ -10,10 +10,6 @@ pipeline {
         )
     }
 
-    // Объявление переменных окружения
-    environment {
-    }
-
     stages {
         stage('1. Init ssh-connection and check Docker') {
             steps {
