@@ -11,7 +11,7 @@ pipeline {
     }
 
     stages {
-        stage('Check Docker') {
+        stage('1. Init ssh-connection and check Docker') {
             steps {
                 script {
                     // Подключаем credentials
@@ -22,7 +22,6 @@ pipeline {
                             passwordVariable: 'SshPassword'
                         )
                     ]) {
-                        // Объявляем remote внутри script через def
                         def remote = [
                             name: 'elma',
                             host: params.RemoteHostVm,
@@ -30,11 +29,10 @@ pipeline {
                             password: SshPassword,
                             allowAnyHosts: true
                         ]
-
-                        echo "Connecting to ${remote.host} as ${remote.user}"
-
-                        // Выполняем команду на удалённом сервере
-                        sshCommand remote: remote, command: 'docker ps'
+                        echo "----------Вывод docker контейнеров----------"
+                        echo "Соединение успешно к ${remote.host} с пользователем ${remote.user}"
+                        echo "----------Вывод docker контейнеров----------"
+                        sshCommand remote: remote, command: 'sudo docker ps'
                     }
                 }
             }
