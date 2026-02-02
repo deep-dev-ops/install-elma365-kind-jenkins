@@ -105,7 +105,7 @@ EOF
                     def checkContainer = sshCommand(
                         remote: RemoteConnectionSsh,
                         returnStdout: true,
-                        command: "docker ps --filter name=elma365 --format '{{.Names}}'"
+                        command: "sudo docker ps --filter name=elma365 --format '{{.Names}}'"
                     ).trim()
                     
                     echo "----------Вывод docker контейнеров----------"
