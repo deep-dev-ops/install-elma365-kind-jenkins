@@ -38,7 +38,7 @@ pipeline {
                         echo "----------Вывод подключения----------"
                         echo "Соединение успешно к ${params.RemoteHostVm} с пользователем ${SshUser}"
                         echo "----------Вывод docker контейнеров----------"
-                        sshCommand remote: RemoteConnectionSsh, command: 'sudo docker ps'
+                        sshCommand remote: RemoteConnectionSsh, command: "sudo docker ps"
                     }
                 }
             }
@@ -71,8 +71,8 @@ ELMA365_ENABLED_FEATUREFLAGS="allowPortal","enableModuleServices","allowEditNotM
 EOF
 """
                     echo "----------Проверка временного каталога и созданных файлов----------"
-                    sshCommand remote: RemoteConnectionSsh, command: 'cat ${env.RemoteDirName}/config-elma365.txt'
-                    sshCommand remote: RemoteConnectionSsh, command: 'ls -li'
+                    sshCommand remote: RemoteConnectionSsh, command: "cat ${env.RemoteDirName}/config-elma365.txt"
+                    sshCommand remote: RemoteConnectionSsh, command: "ls -li"
                 }
             }
         }
