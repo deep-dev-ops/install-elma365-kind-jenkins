@@ -3,8 +3,8 @@ pipeline {
 
     parameters {
         string(
-            name: 'RemoteHostVm', 
-            defaultValue: '192.168.31.120', 
+            name: 'RemoteHostVm',
+            defaultValue: '192.168.31.120',
             description: 'IP или hostname удалённого сервера'
         )
     }
@@ -20,18 +20,16 @@ pipeline {
                             passwordVariable: 'SshPassword'
                         )
                     ]) {
-                        // Правильное создание remote через remotes {}
-                        remotes {
-                            elmaServer {
-                                host = params.RemoteHostVm
-                                user = SshUser
-                                password = SshPassword
-                                allowAnyHosts = true
-                            }
-                        }
+                        // Объявляем remote через def внутри script
+                        def remote = [
+                            name: 'elma',
+                            host: params.RemoteHostVm,
+                            user: SshUser,
+                            password: SshPassword,
+                            allowAnyHosts: true
+                        ]
 
-                        // Выполнение команды через sshCommand
-                        sshCommand remote: elmaServer, command: 'docker ps'
+                        sshCommand remote: remote, command: 'docker ps'
                     }
                 }
             }
