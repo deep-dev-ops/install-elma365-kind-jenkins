@@ -1,23 +1,18 @@
-// ---------- Объявляем remote глобально ----------
-def remote  
-
 pipeline {
     agent any
 
-    // ---------- Глобальные параметры ----------
     parameters {
         string(
             name: 'RemoteHostVm', 
             defaultValue: '192.168.31.120', 
-            description: 'IP или hostname удалённого сервера, куда будет устанавливаться ELMA365 KinD'
+            description: 'IP или hostname удалённого сервера'
         )
     }
 
     stages {
-        stage('1. Init SSH') {
+        stage('Check Docker') {
             steps {
                 script {
-                    // Подставляем логин/пароль через Credentials
                     withCredentials([
                         usernamePassword(
                             credentialsId: 'ssh-elma1-pass-and-login',
@@ -25,24 +20,19 @@ pipeline {
                             passwordVariable: 'SshPassword'
                         )
                     ]) {
-                        // Инициализируем глобальный remote
-                        remote = [
-                            name: 'elma',
-                            host: params.RemoteHostVm,
-                            user: SshUser,
-                            password: SshPassword,
-                            allowAnyHosts: true
-                        ]
-                    }
-                }
-            }
-        }
+                        // Правильное создание remote через remotes {}
+                        remotes {
+                            elmaServer {
+                                host = params.RemoteHostVm
+                                user = SshUser
+                                password = SshPassword
+                                allowAnyHosts = true
+                            }
+                        }
 
-        stage('Check Docker') {
-            steps {
-                script {
-                    // Используем ранее созданный remote
-                    sshCommand remote: remote, command: 'docker ps'
+                        // Выполнение команды через sshCommand
+                        sshCommand remote: elmaServer, command: 'docker ps'
+                    }
                 }
             }
         }
