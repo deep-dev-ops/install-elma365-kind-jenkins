@@ -44,10 +44,34 @@ pipeline {
             }
         }
 
-        stage('2. Check curl') {
+        stage('2. Create config file and download install script ELMA365') {
             steps {
                 script {
-                    sshCommand remote: RemoteConnectionSsh, command: 'curl -I ya.ru'
+                    // Создание файла config-elma365.txt
+                    sshCommand remote: RemoteConnectionSsh, command: '''\
+                      cat <<'EOF' > config-elma365.txt
+                      ELMA365_HOST=elma1.work.local
+                      ELMA365_EMAIL=admin@mail.com
+                      ELMA365_PASSWORD=1224
+                      ELMA365_LANGUAGE=ru-RU
+                      ELMA365_EDITION=standard
+                      ELMA365_SMTP_HOST=smtp.mail.ru
+                      ELMA365_SMTP_PORT=465
+                      ELMA365_SMTP_FROM=your-mail@mail.ru
+                      ELMA365_SMTP_USER=your-mail@mail.ru
+                      ELMA365_SMTP_PASSWORD="YOUR-PASS"
+                      ELMA365_SMTP_TLS=true
+                      ELMA365_PORT_FORWARD_PSQL=5432
+                      ELMA365_PORT_FORWARD_MONGO=27017
+                      ELMA365_PORT_FORWARD_AMQP=15672
+                      ELMA365_PORT_FORWARD_REDIS=6379
+                      ELMA365_PORT_FORWARD_S3=9000
+                      ELMA365_DEBUG=true
+                      ELMA365_ENABLED_FEATUREFLAGS="allowPortal","enableModuleServices","allowEditNotManagableExtensions","enableSearchInProcessMonitor","collector_enable_archivingItems"
+                      EOF
+                      '''
+                    // Проверка сформированного файла
+                    sshCommand remote: RemoteConnectionSsh, command: 'cat config-elma365.txt'
                 }
             }
         }
