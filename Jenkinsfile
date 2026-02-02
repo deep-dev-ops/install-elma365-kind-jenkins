@@ -86,7 +86,7 @@ ELMA365_ENABLED_FEATUREFLAGS="allowPortal","enableModuleServices","allowEditNotM
 EOF
 """
                     echo "----------Загрузка файла скрипта установки----------"
-                    sshCommand remote: RemoteConnectionSsh, command: "sudo curl -fsSL -o ${env.RemoteDirName}/elma365-docker.sh https://dl.elma365.com/onPremise/${params.YearVersion}/${params.MajorVersion}/${params.MinorVersion}/elma365-docker-${params.YearVersion}.{params.MajorVersion}.${params.MinorVersion}"
+                    sshCommand remote: RemoteConnectionSsh, command: "sudo curl -fsSL -o ${env.RemoteDirName}/elma365-docker.sh https://dl.elma365.com/onPremise/${params.YearVersion}/${params.MajorVersion}/${params.MinorVersion}/elma365-docker-${params.YearVersion}.${params.MajorVersion}.${params.MinorVersion}"
                     
                     echo "----------Добавление прав x для возможности запуска скрипта----------"
                     sshCommand remote: RemoteConnectionSsh, command: "sudo chmod +x ${env.RemoteDirName}/elma365-docker.sh"
