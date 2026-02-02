@@ -54,7 +54,7 @@ pipeline {
                     sshCommand remote: RemoteConnectionSsh, command: "mkdir -p ${env.RemoteDirName}"
                     
                     // Создание файла config-elma365.txt
-                    sshCommand remote: RemoteConnectionSsh, command: '''\
+                    sshCommand remote: RemoteConnectionSsh, command: """\
                     cat <<'EOF' > ${env.RemoteDirName}/config-elma365.txt
 ELMA365_HOST=elma1.work.local
 ELMA365_EMAIL=admin@mail.com
@@ -68,7 +68,8 @@ ELMA365_PORT_FORWARD_REDIS=6379
 ELMA365_PORT_FORWARD_S3=9000
 ELMA365_DEBUG=true
 ELMA365_ENABLED_FEATUREFLAGS="allowPortal","enableModuleServices","allowEditNotManagableExtensions","enableSearchInProcessMonitor","collector_enable_archivingItems"
-'''
+EOF
+"""
                     echo "----------Проверка временного каталога и созданных файлов----------"
                     sshCommand remote: RemoteConnectionSsh, command: 'cat ${env.RemoteDirName}/config-elma365.txt'
                     sshCommand remote: RemoteConnectionSsh, command: 'ls -li'
