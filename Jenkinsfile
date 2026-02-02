@@ -86,7 +86,7 @@ ELMA365_ENABLED_FEATUREFLAGS="allowPortal","enableModuleServices","allowEditNotM
 EOF
 """
                     echo "----------Загрузка файла скрипта установки----------"
-                    sshCommand remote: RemoteConnectionSsh, command: "sudo curl -fsSL -o ${env.RemoteDirName}/elma365-docker.sh https://dl.elma365.com/onPremise/${params.YearVersion}/${params.MajorVersion}/${params.MinorVersion}/elma365-docker-${params.YearVersion}.${params.MajorVersion}.${params.MinorVersion}"
+                    sshCommand remote: RemoteConnectionSsh, command: "sudo curl -fsSL -o ${env.RemoteDirName}/elma365-docker.sh https://dl.elma365.com/onPremise/${params.YearVersion}/${params.MajorVersion}/${params.MinorVersion}/elma365-docker-${params.YearVersion}.{params.MajorVersion}.${params.MinorVersion}"
                     
                     echo "----------Добавление прав x для возможности запуска скрипта----------"
                     sshCommand remote: RemoteConnectionSsh, command: "sudo chmod +x ${env.RemoteDirName}/elma365-docker.sh"
@@ -97,5 +97,35 @@ EOF
                 }
             }
         }
+        
+        stage('3. Search and uninstall current ELMA365') {
+            steps {
+                script {
+                    echo "----------Проверка наличия контейнера ELMA365----------"
+                    def checkContainer = sshCommand(
+                        remote: RemoteConnectionSsh,
+                        returnStdout: true,
+                        command: "docker ps --filter name=elma365 --format '{{.Names}}'"
+                    ).trim()
+                    
+                    echo "----------Вывод docker контейнеров----------"
+                    sshCommand remote: RemoteConnectionSsh, command: "sudo docker ps"
+                    
+                    if (checkContainer) {
+                        echo "----------Контейнер elma365 найден: ${checkContainer}----------"
+                        echo "----------Выполняем удаление----------"
+                        sshCommand(
+                            remote: RemoteConnectionSsh, command: "echo 'y' | sudo ${env.RemoteDirName}/elma365-docker.sh --delete"
+                        )
+                        echo "----------Удаление контейнера завершено----------"
+                        echo "----------Вывод docker контейнеров----------"
+                        sshCommand remote: RemoteConnectionSsh, command: "sudo docker ps"
+                    } else {
+                        echo "----------Контейнер elma365 не найден. Пропускаем удаление----------"
+                    }
+                }
+            }
+        }
+        
     }
 }
