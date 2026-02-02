@@ -12,13 +12,15 @@ pipeline {
 
     // Объявление переменных окружения
     environment {
-        RemoteConnectionSsh = ''
     }
 
     stages {
         stage('1. Init ssh-connection and check Docker') {
             steps {
                 script {
+                    // создаём глобальную переменную remoteConnection для использования в других stage
+                    RemoteConnectionSsh = null
+                    
                     withCredentials([
                         usernamePassword(
                             // Использование cred Jenkins для подключения к машине
@@ -28,7 +30,7 @@ pipeline {
                         )
                     ]) {
                         // Инициализация remote и сохранение в environment
-                        env.RemoteConnectionSsh = [
+                        RemoteConnectionSsh = [
                             name: 'elma',
                             host: params.RemoteHostVm,
                             user: SshUser,
@@ -40,7 +42,7 @@ pipeline {
                         echo "----------Вывод подключения----------"
                         echo "Соединение успешно к ${params.RemoteHostVm} с пользователем ${SshUser}"
                         echo "----------Вывод docker контейнеров----------"
-                        sshCommand remote: env.RemoteConnectionSsh, command: 'sudo docker ps'
+                        sshCommand remote: RemoteConnectionSsh, command: 'sudo docker ps'
                     }
                 }
             }
@@ -49,7 +51,7 @@ pipeline {
         stage('2. Check curl') {
             steps {
                 script {
-                    sshCommand remote: env.RemoteConnectionSsh, command: 'curl -I ya.ru'
+                    sshCommand remote: RemoteConnectionSsh, command: 'curl -I ya.ru'
                 }
             }
         }
