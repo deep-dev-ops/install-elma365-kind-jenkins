@@ -47,9 +47,15 @@ pipeline {
         stage('2. Create config file and download install script ELMA365') {
             steps {
                 script {
+                    // Объявление переменной с названием директории
+                    env.RemoteDirName = "install-job-elma365-${new Date().format('dd-MM-yyyy--HH-mm')}"
+                
+                    // Создание локальной директории для файлов
+                    sshCommand remote: env.RemoteConnectionSsh, command: "mkdir -p ${env.RemoteDirName}"
+                    
                     // Создание файла config-elma365.txt
                     sshCommand remote: RemoteConnectionSsh, command: '''\
-                    cat <<'EOF' > config-elma365.txt
+                    cat <<'EOF' > ${env.RemoteDirName}/config-elma365.txt
 ELMA365_HOST=elma1.work.local
 ELMA365_EMAIL=admin@mail.com
 ELMA365_PASSWORD=1224
@@ -63,8 +69,9 @@ ELMA365_PORT_FORWARD_S3=9000
 ELMA365_DEBUG=true
 ELMA365_ENABLED_FEATUREFLAGS="allowPortal","enableModuleServices","allowEditNotManagableExtensions","enableSearchInProcessMonitor","collector_enable_archivingItems"
 '''
-                    // Проверка сформированного файла
-                    sshCommand remote: RemoteConnectionSsh, command: 'cat config-elma365.txt'
+                    echo "----------Проверка временного каталога и созданных файлов----------"
+                    sshCommand remote: RemoteConnectionSsh, command: 'cat ${env.RemoteDirName}/config-elma365.txt'
+                    sshCommand remote: RemoteConnectionSsh, command: 'ls -li'
                 }
             }
         }
