@@ -1,6 +1,11 @@
 pipeline {
     agent any
 
+    // ---------- Глобальные параметры----------
+    parameters {
+        string(name: 'RemoteHostVm', defaultValue: '192.168.31.120', description: 'IP или hostname удалённого сервера, куда будет устанавливаться ELMA365 KinD')
+    }
+
     stages {
         stage('1. Init SSH') {
             steps {
@@ -8,15 +13,15 @@ pipeline {
                     withCredentials([
                         usernamePassword(
                             credentialsId: 'ssh-elma1-pass-and-login',
-                            usernameVariable: 'SSH_USER',
-                            passwordVariable: 'SSH_PASS'
+                            usernameVariable: 'SshUser',
+                            passwordVariable: 'SshPassword'
                         )
                     ]) {
                         remote = [
                             name: 'elma',
-                            host: remoteHost,
-                            user: SSH_USER,
-                            password: SSH_PASS,
+                            host: params.RemoteHostVm,
+                            user: SshUser,
+                            password: SshPassword,
                             allowAnyHosts: true
                         ]
                     }
