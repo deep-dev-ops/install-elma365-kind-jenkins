@@ -75,12 +75,12 @@ pipeline {
                         string(credentialsId: 'elma365-smtp-host', variable: 'SMTP_HOST'),
                         string(credentialsId: 'elma365-smtp-port', variable: 'SMTP_PORT'),
                         string(credentialsId: 'elma365-admin-pass', variable: 'ADMIN_PASS'),
-                        string(credentialsId: 'elma365-admin-mail', variable: 'ADMIN_MAIL')
+                        string(credentialsId: 'elma365-admin-mail', variable: 'ADMIN_MAIL'),
                     ]) {
                     
-                    // Создание файла config-elma365.txt
-                    sshCommand remote: RemoteConnectionSsh, command: """\
-                    cat <<'EOF' > ${env.RemoteDirName}/config-elma365.txt
+                        // Создание файла config-elma365.txt
+                        sshCommand remote: RemoteConnectionSsh, command: """\
+                        cat <<'EOF' > ${env.RemoteDirName}/config-elma365.txt
 ELMA365_HOST=elma1.work.local
 ELMA365_EMAIL=${ADMIN_MAIL}
 ELMA365_PASSWORD=${ADMIN_PASS}
@@ -101,6 +101,8 @@ ELMA365_SMTP_PASSWORD="${SMTP_PASS}"
 ELMA365_SMTP_TLS=true
 EOF
 """
+                    }
+
                     echo "----------Загрузка файла скрипта установки----------"
                     sshCommand remote: RemoteConnectionSsh, command: "sudo curl -fsSL -o ${env.RemoteDirName}/elma365-docker.sh https://dl.elma365.com/onPremise/${params.YearVersion}/${params.MajorVersion}/${params.MinorVersion}/elma365-docker-${params.YearVersion}.${params.MajorVersion}.${params.MinorVersion}"
                     
