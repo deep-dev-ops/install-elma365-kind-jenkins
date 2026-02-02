@@ -51,7 +51,7 @@ pipeline {
                     env.RemoteDirName = "install-job-elma365-${new Date().format('dd-MM-yyyy--HH-mm')}"
                 
                     // Создание локальной директории для файлов
-                    sshCommand remote: env.RemoteConnectionSsh, command: "mkdir -p ${env.RemoteDirName}"
+                    sshCommand remote: RemoteConnectionSsh, command: "mkdir -p ${env.RemoteDirName}"
                     
                     // Создание файла config-elma365.txt
                     sshCommand remote: RemoteConnectionSsh, command: '''\
