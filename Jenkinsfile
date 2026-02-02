@@ -1,7 +1,7 @@
 pipeline {
     agent any
 
-    // ---------- Глобальные параметры----------
+    // Объявление параметров job
     parameters {
         string(
             name: 'RemoteHostVm',
@@ -10,30 +10,46 @@ pipeline {
         )
     }
 
+    // Объявление переменных окружения
+    environment {
+        RemoteConnectionSsh = ''
+    }
+
     stages {
         stage('1. Init ssh-connection and check Docker') {
             steps {
                 script {
-                    // Подключаем credentials
                     withCredentials([
                         usernamePassword(
+                            // Использование cred Jenkins для подключения к машине
                             credentialsId: 'ssh-elma1-pass-and-login',
                             usernameVariable: 'SshUser',
                             passwordVariable: 'SshPassword'
                         )
                     ]) {
-                        def remote = [
+                        // Инициализация remote и сохранение в environment
+                        env.RemoteConnectionSsh = [
                             name: 'elma',
                             host: params.RemoteHostVm,
                             user: SshUser,
                             password: SshPassword,
                             allowAnyHosts: true
                         ]
+                        
+                        // Проверка подключения через команды
+                        echo "----------Вывод подключения----------"
+                        echo "Соединение успешно к ${params.RemoteHostVm} с пользователем ${SshUser}"
                         echo "----------Вывод docker контейнеров----------"
-                        echo "Соединение успешно к ${remote.host} с пользователем ${remote.user}"
-                        echo "----------Вывод docker контейнеров----------"
-                        sshCommand remote: remote, command: 'sudo docker ps'
+                        sshCommand remote: env.RemoteConnectionSsh, command: 'sudo docker ps'
                     }
+                }
+            }
+        }
+
+        stage('2. Check curl') {
+            steps {
+                script {
+                    sshCommand remote: env.RemoteConnectionSsh, command: 'curl -I ya.ru'
                 }
             }
         }
