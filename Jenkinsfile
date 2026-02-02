@@ -68,12 +68,22 @@ pipeline {
                     // Создание локальной директории для файлов
                     sshCommand remote: RemoteConnectionSsh, command: "mkdir -p ${env.RemoteDirName}"
                     
+                    // Подгружаем секреты Jenkins
+                    withCredentials([
+                        string(credentialsId: 'elma365-smtp-password', variable: 'SMTP_PASS'),
+                        string(credentialsId: 'elma365-smtp-user', variable: 'SMTP_USER'),
+                        string(credentialsId: 'elma365-smtp-host', variable: 'SMTP_HOST'),
+                        string(credentialsId: 'elma365-smtp-port', variable: 'SMTP_PORT'),
+                        string(credentialsId: 'elma365-admin-pass', variable: 'ADMIN_PASS'),
+                        string(credentialsId: 'elma365-admin-mail', variable: 'ADMIN_MAIL')
+                    ]) {
+                    
                     // Создание файла config-elma365.txt
                     sshCommand remote: RemoteConnectionSsh, command: """\
                     cat <<'EOF' > ${env.RemoteDirName}/config-elma365.txt
 ELMA365_HOST=elma1.work.local
-ELMA365_EMAIL=admin@mail.com
-ELMA365_PASSWORD=1224
+ELMA365_EMAIL=${ADMIN_MAIL}
+ELMA365_PASSWORD=${ADMIN_PASS}
 ELMA365_LANGUAGE=ru-RU
 ELMA365_EDITION=standard
 ELMA365_PORT_FORWARD_PSQL=5432
@@ -83,6 +93,12 @@ ELMA365_PORT_FORWARD_REDIS=6379
 ELMA365_PORT_FORWARD_S3=9000
 ELMA365_DEBUG=true
 ELMA365_ENABLED_FEATUREFLAGS="allowPortal","enableModuleServices","allowEditNotManagableExtensions","enableSearchInProcessMonitor","collector_enable_archivingItems"
+ELMA365_SMTP_HOST=${SMTP_HOST}
+ELMA365_SMTP_PORT=${SMTP_PORT}
+ELMA365_SMTP_FROM=${SMTP_USER}
+ELMA365_SMTP_USER=${SMTP_USER}
+ELMA365_SMTP_PASSWORD="${SMTP_PASS}"
+ELMA365_SMTP_TLS=true
 EOF
 """
                     echo "----------Загрузка файла скрипта установки----------"
@@ -114,15 +130,22 @@ EOF
                     if (checkContainer) {
                         echo "----------Контейнер elma365 найден: ${checkContainer}----------"
                         echo "----------Выполняем удаление----------"
-                        sshCommand(
-                            remote: RemoteConnectionSsh, command: "echo 'y' | sudo ${env.RemoteDirName}/elma365-docker.sh --delete"
-                        )
+                        sshCommand remote: RemoteConnectionSsh, command: "echo 'y' | sudo ${env.RemoteDirName}/elma365-docker.sh --delete"
                         echo "----------Удаление контейнера завершено----------"
                         echo "----------Вывод docker контейнеров----------"
                         sshCommand remote: RemoteConnectionSsh, command: "sudo docker ps"
                     } else {
                         echo "----------Контейнер elma365 не найден. Пропускаем удаление----------"
                     }
+                }
+            }
+        }
+        
+                stage('4. Install new ELMA365') {
+            steps {
+                script {
+                    echo "----------Запуск установки ELMA365----------"
+                    sshCommand remote: RemoteConnectionSsh, command: "echo 'y' | sudo ${env.RemoteDirName}/elma365-docker.sh"
                 }
             }
         }
