@@ -8,6 +8,21 @@ pipeline {
             defaultValue: '192.168.31.120',
             description: 'IP или hostname удалённого сервера'
         )
+        string(
+            name: 'YearVersion',
+            defaultValue: '2025',
+            description: 'Год выпуска версии ELMA365'
+        )
+        string(
+            name: 'MajorVersion',
+            defaultValue: '10',
+            description: 'Мажор выпуска версии ELMA365'
+        )
+        string(
+            name: 'MinorVersion',
+            defaultValue: '10',
+            description: 'Минор выпуска версии ELMA365'
+        )
     }
 
     stages {
@@ -70,9 +85,15 @@ ELMA365_DEBUG=true
 ELMA365_ENABLED_FEATUREFLAGS="allowPortal","enableModuleServices","allowEditNotManagableExtensions","enableSearchInProcessMonitor","collector_enable_archivingItems"
 EOF
 """
+                    echo "----------Загрузка файла скрипта установки----------"
+                    sshCommand remote: RemoteConnectionSsh, command: "sudo curl -fsSL -o ${env.RemoteDirName}/elma365-docker.sh https://dl.elma365.com/onPremise/${params.YearVersion}/${params.MajorVersion}/${params.MinorVersion}/elma365-docker-${params.YearVersion}.{params.MajorVersion}.${params.MinorVersion}"
+                    
+                    echo "----------Добавление прав x для возможности запуска скрипта----------"
+                    sshCommand remote: RemoteConnectionSsh, command: "sudo chmod +x ${env.RemoteDirName}/elma365-docker.sh"
+                    
                     echo "----------Проверка временного каталога и созданных файлов----------"
                     sshCommand remote: RemoteConnectionSsh, command: "cat ${env.RemoteDirName}/config-elma365.txt"
-                    sshCommand remote: RemoteConnectionSsh, command: "ls -li"
+                    sshCommand remote: RemoteConnectionSsh, command: "ls -li ${env.RemoteDirName}"
                 }
             }
         }
