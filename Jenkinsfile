@@ -149,7 +149,10 @@ EOF
             steps {
                 script {
                     echo "----------Запуск установки ELMA365----------"
-                    sshCommand remote: RemoteConnectionSsh, command: " yes | sudo ${env.RemoteDirName}/elma365-docker.sh"
+                    //sshCommand remote: RemoteConnectionSsh, command: " yes | sudo ${env.RemoteDirName}/elma365-docker.sh"
+                    sshCommand remote: RemoteConnectionSsh, command: """
+                    cd ${env.RemoteDirName} && yes | sudo ./elma365-docker.sh
+                    """
                 }
             }
         }
