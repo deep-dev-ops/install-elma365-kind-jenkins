@@ -100,6 +100,7 @@ ELMA365_PORT_FORWARD_S3=9000
 ELMA365_DEBUG=true
 ELMA365_EXTRA_ARGS="ELMA365_MAX_GRPC_MESSAGE_SIZE:'10388608' ELMA365_SCRIPT_COMPILE_TTL:5m"
 ELMA365_ENABLED_FEATUREFLAGS="allowPortal","enableModuleServices","allowEditNotManagableExtensions","enableSearchInProcessMonitor","collector_enable_archivingItems"
+ELMA365_AUDIT=true
 EOF
 """
                     }
